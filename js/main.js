@@ -27,28 +27,97 @@ class PackedObject3D {
 
     describe() {
       console.log(`Object dimensions: ${this.width} x ${this.height} x ${this.depth}`);
-      this.position.describe();
+      this.pos.describe();
     }
 }
-
+const edit_texts = ["position x", "position y", "position z"];
 
 var objectsList = []
-const pos = new Position(1,0,0);
-const object = new PackedObject3D(2,3,2, pos);
-objectsList.push(object)
 
+var body = document.body,
+    html = document.documentElement;
+var height = Math.max( body.scrollHeight, body.offsetHeight, 
+                       html.clientHeight, html.scrollHeight, html.offsetHeight );
+const leftContainer = document.getElementById("editContainer");
+leftContainer.style.height = `${height-100}px`
+let editContainer = document.createElement("div");
+editContainer.style.height = "100%";
+editContainer.style.overflowY = "scroll";
 
-var x = document.createElement("INPUT");
-x.setAttribute("type", "number");
-x.setAttribute("value", object.pos.x);
-document.getElementById("editContainer").appendChild(x)
-x.addEventListener("change", (event) => {
-  console.log(x.getAttribute("value"))
-  objectsList[0].pos.x = Number(x.value)
-  console.log(objectsList[0])
-  rendering();
-});
+leftContainer.appendChild(editContainer);
 
+let newObjectBtn = document.createElement("button");
+newObjectBtn.innerHTML = "Add new";
+newObjectBtn.style.margin = "10px";
+newObjectBtn.style.padding = "10px";
+newObjectBtn.onclick = function () {
+  const pos = new Position(1,0,0);
+  const object = new PackedObject3D(2,3,2, pos);
+  objectsList.push(object)
+  createEditPanel(objectsList.length-1);
+  rendering()
+};
+leftContainer.appendChild(newObjectBtn);
+
+function createEditPanel(index) {
+  var wrapper = document.createElement('div');
+  wrapper.style.border = '1px solid';
+  wrapper.style.margin = '0.2em';
+  wrapper.style.padding = '0.2em';
+
+  const header = document.createTextNode(`Item ${index+1}`);
+  wrapper.appendChild(header);
+
+  const tbl = document.createElement('table');
+
+  const tr = tbl.insertRow();
+  for (let j = 0; j < 3; j++) {
+    const td = tr.insertCell();
+    td.appendChild(document.createTextNode(edit_texts[j]));
+  }
+  
+  const tr2 = tbl.insertRow();
+
+  const tdX = tr2.insertCell();
+  var inputX = document.createElement("INPUT");
+  inputX.setAttribute("type", "number");
+  inputX.setAttribute("value", objectsList[index].pos.x);
+  tdX.appendChild(inputX);
+  inputX.addEventListener("change", (event) => {
+    objectsList[index].pos.x = Number(inputX.value)
+    objectsList[index].describe()
+    rendering();
+  });
+
+  const tdY = tr2.insertCell();
+  var inputY = document.createElement("INPUT");
+  inputY.setAttribute("type", "number");
+  inputY.setAttribute("value", objectsList[index].pos.y);
+  tdY.appendChild(inputY);
+  inputY.addEventListener("change", (event) => {
+    objectsList[index].pos.y = Number(inputY.value)
+    objectsList[index].describe()
+    rendering();
+  });
+
+  const tdZ = tr2.insertCell();
+  var inputZ = document.createElement("INPUT");
+  inputZ.setAttribute("type", "number");
+  inputZ.setAttribute("value", objectsList[index].pos.z);
+  tdZ.appendChild(inputZ);
+  inputZ.addEventListener("change", (event) => {
+    objectsList[index].pos.z = Number(inputZ.value)
+    objectsList[index].describe()
+    rendering();
+  });
+
+  wrapper.appendChild(tbl);
+  editContainer.appendChild(wrapper);
+}
+
+for (let i = 0; i < objectsList.length; i++) {
+  createEditPanel(i);
+}
 
 // Scene
 const scene = new THREE.Scene();
@@ -109,7 +178,6 @@ const palettMesh = new THREE.Mesh(palettGeometry, palettMaterial); // Build box
 palettMesh.position.set(palettDimension[0]/2, palettDimension[1]/2, -palettDimension[2]/2);
 scene.add(palettMesh); // Add box to canvas
 
-var obj = objectsList[0]
 var objMaterial = new THREE.ShaderMaterial({
   uniforms: {
     thickness: {
@@ -119,24 +187,26 @@ var objMaterial = new THREE.ShaderMaterial({
   vertexShader: vertexShader,
   fragmentShader: fragmentShader
 });
-const objGeometry = new THREE.BoxGeometry(obj.width,obj.height, obj.depth); // Define geometry
-const objMesh = new THREE.Mesh(objGeometry, objMaterial); // Build box
-console.log(obj.position)
-objMesh.position.set(obj.position[0], obj.position[1], obj.position[2]);
-scene.add(objMesh); // Add box to canvas
 
 
 const rendering = function() {
-    // Rerender every time the page refreshes (pause when on another tab)
-    requestAnimationFrame(rendering);
+  // Rerender every time the page refreshes (pause when on another tab)
+  requestAnimationFrame(rendering);
 	// Update trackball controls
-    controls.update();
-	// Constantly rotate box
-    // scene.rotation.z -= 0.005;
-	// scene.rotation.x -= 0.01;
+  controls.update();
   
-  var obj = objectsList[0]
-  objMesh.position.set(obj.position[0], obj.position[1], obj.position[2]);
+  for (let i = 0; i < objectsList.length; i++) {
+    let obj = objectsList[i];
+    var object = scene.getObjectByName(`object_${i}`);
+    if (object == null) {
+      const objGeometry = new THREE.BoxGeometry(obj.width,obj.height, obj.depth); // Define geometry
+      const objMesh = new THREE.Mesh(objGeometry, objMaterial); // Build box
+      objMesh.position.set(obj.position[0], obj.position[1], obj.position[2]);
+      objMesh.name = `object_${i}`;
+      scene.add(objMesh); // Add box to canvas
+    }
+    object.position.set(obj.position[0], obj.position[1], obj.position[2]);
+  }
 	renderer.render(scene, camera);
 }
 rendering();
