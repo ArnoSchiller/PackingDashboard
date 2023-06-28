@@ -1,7 +1,7 @@
 import * as THREE from '../node_modules/three/build/three.module.js'
 import { TrackballControls } from '../node_modules/three/examples/jsm/controls/TrackballControls.js'
 
-const MAX_X = 8, MAX_Y = 10, MAX_Z = 12
+const MAX_X = 8, MAX_Y = 12, MAX_Z = 10
 
 const BOTTOM_PADDING = 100
 
@@ -18,46 +18,45 @@ class Position {
 }
 
 class PackedObject3D {
-	constructor(name, width, height, depth) {
+	constructor(name, width, length, height) {
 		this.name = name 
 		this.width = width 
+    this.length = length
 		this.height = height 
-		this.depth = depth 
 
-		this.pos = new Position(0, MAX_Y + 2, 0) 
+		this.pos = new Position(0, 0, MAX_Z + 2) 
 		this.visible = true
 		let col = objColors[Math.round(Math.random() * (objColors.length-1))]
-		this.colorString = LightenColor(col, Math.random() * 50)
+		this.colorString = "#" + Math.floor(Math.random()*16777215).toString(16) //LightenColor(col, Math.random() * 50)
         this.color =  new THREE.Color(this.colorString)
 	}
 	
 	get position() {		
 		return [
 			this.pos.x + this.width / 2 - MAX_X / 2, 
-			this.pos.z + this.depth / 2 - MAX_Z / 2, 
-			this.pos.y + this.height / 2
+			this.pos.y + this.length / 2 - MAX_Y / 2, 
+			this.pos.z + this.height / 2 - MAX_Z / 2
 		] 
 	}
 
 	toString() {
-		return `${this.name} (${this.width} x ${this.height} x ${this.depth})` 
+    console.log(this)
+		return `${this.name} (${this.width} x ${this.length} x ${this.height})` 
 	}
 }
 
-
 const objects = [
-  	new PackedObject3D("Zaunelement", 1, 2, 3, null)
+  	new PackedObject3D("Zaunelement", 4, 8, 1, null),
+  	new PackedObject3D("Zeunpfosten", 1, 5, 1, null)
 ]
 
 var objectsList = []
 
-var body = document.body,
-    html = document.documentElement 
-var height = Math.max( 
+var body = document.body, html = document.documentElement 
+var windowHeight = Math.max( 
   body.scrollHeight, body.offsetHeight, 
   html.clientHeight, html.scrollHeight, html.offsetHeight 
 ) 
-
 
 /* 
 #################################################################################
@@ -127,10 +126,10 @@ function createEditPanelForObject(container, index) {
   inputX.style.width = "70px" 
   tdX.appendChild(inputX) 
   inputX.addEventListener("change", (event) => {
-	var value = Number(inputX.value)
-	let max = MAX_X - objectsList[index].width
-	if(value > max) { value = max; inputX.value = value }
-	if(value < 0) { value = 0; inputX.value = value }
+    var value = Number(inputX.value)
+    let max = MAX_X - objectsList[index].width
+    if(value > max) { value = max; inputX.value = value }
+    if(value < 0) { value = 0; inputX.value = value }
 
     objectsList[index].pos.x = value
     rendering() 
@@ -143,11 +142,11 @@ function createEditPanelForObject(container, index) {
   inputY.style.width = "70px" 
   tdY.appendChild(inputY) 
   inputY.addEventListener("change", (event) => {
-	var value = Number(inputY.value)
-	let max = MAX_Y - objectsList[index].height
-	if(value > max) { value = max; inputY.value = value }
-	if(value < 0) { value = 0; inputY.value = value }
-	
+    var value = Number(inputY.value)
+    let max = MAX_Y - objectsList[index].length
+    if(value > max) { value = max; inputY.value = value }
+    if(value < 0) { value = 0; inputY.value = value }
+    
     objectsList[index].pos.y = value
     rendering() 
   }) 
@@ -159,10 +158,10 @@ function createEditPanelForObject(container, index) {
   inputZ.style.width = "70px" 
   tdZ.appendChild(inputZ) 
   inputZ.addEventListener("change", (event) => {
-	var value = Number(inputZ.value)
-	let max = MAX_Z - objectsList[index].depth
-	if(value > max) { value = max; inputZ.value = value }
-	if(value < 0) { value = 0; inputZ.value = value }
+    var value = Number(inputZ.value)
+    let max = MAX_Z - objectsList[index].height
+    if(value > max) { value = max; inputZ.value = value }
+    if(value < 0) { value = 0; inputZ.value = value }
 
     objectsList[index].pos.z = value
     rendering() 
@@ -175,7 +174,7 @@ function createEditPanelForObject(container, index) {
 function createEditPanel() {
 
   const leftContainer = document.getElementById("editContainer") 
-  leftContainer.style.height = `${height-100}px`
+  leftContainer.style.height = `${windowHeight-BOTTOM_PADDING}px`
 
   let editContainer = document.createElement("div") 
   editContainer.style.height = "100%" 
@@ -201,7 +200,7 @@ function createEditPanel() {
   newObjectBtn.style.padding = "10px" 
   newObjectBtn.onclick = function () {
 	let obj = objects[newObjectSelect.value]
-	const object = new PackedObject3D(obj.name, obj.width, obj.height, obj.depth)
+	const object = new PackedObject3D(obj.name, obj.width, obj.length, obj.height)
     objectsList.push(object)
     createEditPanelForObject(editContainer, objectsList.length-1) 
     rendering()
@@ -251,7 +250,7 @@ scene.add( gridHelper )
 //Trackball Controls for Camera 
 const controls = new TrackballControls(camera, renderer.domElement)  
 controls.maxDistance = 40 
-controls.minDistance = 20 
+controls.minDistance = 10 
 
 // Make Canvas Responsive
 window.addEventListener('resize', () => {
@@ -270,30 +269,28 @@ image.addEventListener('load', () =>
 image.src = '../static/textures/wood.jpg'
 
 // Create palett
-const palettGeometry = new THREE.BoxGeometry(MAX_X, MAX_Z, 0.5)  
+const palettGeometry = new THREE.BoxGeometry(MAX_X, MAX_Y, 0.5)  
 const palettMaterial = new THREE.MeshLambertMaterial({color: 0xe3e2ca, map: texture})  // Define material
 const palettMesh = new THREE.Mesh(palettGeometry, palettMaterial)  
-palettMesh.position.z = -0.25
+palettMesh.position.z = - MAX_Z / 2 -0.25
 scene.add(palettMesh)  
 
 const points = [];
-points.push( new THREE.Vector3( -MAX_X/2, -MAX_Z/2, 0 ) );
-points.push( new THREE.Vector3( -MAX_X/2, -MAX_Z/2, MAX_Y ) );
-points.push( new THREE.Vector3( -MAX_X/2, MAX_Z/2, MAX_Y ) );
-points.push( new THREE.Vector3( -MAX_X/2, MAX_Z/2, 0 ) );
+points.push( new THREE.Vector3( -MAX_X/2, -MAX_Y/2, -MAX_Z/2 ) );
+points.push( new THREE.Vector3( -MAX_X/2, -MAX_Y/2, MAX_Z/2) );
+points.push( new THREE.Vector3( -MAX_X/2, MAX_Y/2, MAX_Z/2 ) );
+points.push( new THREE.Vector3( -MAX_X/2, MAX_Y/2, -MAX_Z/2 ) );
 
-points.push( new THREE.Vector3( -MAX_X/2, MAX_Z/2, MAX_Y ) );
-points.push( new THREE.Vector3( MAX_X/2, MAX_Z/2, MAX_Y ) );
-points.push( new THREE.Vector3( MAX_X/2, MAX_Z/2, 0 ) );
+points.push( new THREE.Vector3( -MAX_X/2, MAX_Y/2, MAX_Z/2 ) );
+points.push( new THREE.Vector3( MAX_X/2, MAX_Y/2, MAX_Z/2 ) );
+points.push( new THREE.Vector3( MAX_X/2, MAX_Y/2, -MAX_Z/2 ) );
 
-points.push( new THREE.Vector3( MAX_X/2, MAX_Z/2, MAX_Y ) );
-points.push( new THREE.Vector3( MAX_X/2, -MAX_Z/2, MAX_Y ) );
-points.push( new THREE.Vector3( MAX_X/2, -MAX_Z/2, 0 ) );
+points.push( new THREE.Vector3( MAX_X/2, MAX_Y/2, MAX_Z/2 ) );
+points.push( new THREE.Vector3( MAX_X/2, -MAX_Y/2, MAX_Z/2 ) );
+points.push( new THREE.Vector3( MAX_X/2, -MAX_Y/2, -MAX_Z/2 ) );
 
-points.push( new THREE.Vector3( MAX_X/2, -MAX_Z/2, MAX_Y ) );
-points.push( new THREE.Vector3( -MAX_X/2, -MAX_Z/2, MAX_Y ) );
-
-
+points.push( new THREE.Vector3( MAX_X/2, -MAX_Y/2, MAX_Z/2 ) );
+points.push( new THREE.Vector3( -MAX_X/2, -MAX_Y/2, MAX_Z/2 ) );
 
 const material = new THREE.LineBasicMaterial( { color: 0xaaaaaa } );
 const geometry = new THREE.BufferGeometry().setFromPoints( points );
@@ -315,7 +312,7 @@ const rendering = function() {
 		let obj = objectsList[i] 
 		var object = scene.getObjectByName(`object_${i}`) 
 		if (object == null && obj.visible) {
-			const objGeometry = new THREE.BoxGeometry(obj.width, obj.depth, obj.height)  // Define geometry
+			const objGeometry = new THREE.BoxGeometry(obj.width, obj.length, obj.height)  // Define geometry
 			var objMaterial = new THREE.MeshStandardMaterial({color: obj.color}); 
 			const objMesh = new THREE.Mesh(objGeometry, objMaterial)  // Build box
 			objMesh.position.set(
