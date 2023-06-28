@@ -6,15 +6,11 @@ canvas {
     display: block;
 }
 
-
-
-  
-  /* Clear floats after the columns */
-  .row {
+.row {
     display: flex;
     height: 50%;
-  }
-  .column {
+}
+.column {
     flex: 1;
     padding: 20px;
-  }
+}
