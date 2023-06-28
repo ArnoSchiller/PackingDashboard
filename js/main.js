@@ -312,23 +312,15 @@ const rendering = function() {
 		let obj = objectsList[i] 
 		var object = scene.getObjectByName(`object_${i}`) 
 		if (object == null && obj.visible) {
-			const objGeometry = new THREE.BoxGeometry(obj.width, obj.length, obj.height)  // Define geometry
+			const objGeometry = new THREE.BoxGeometry(obj.width, obj.length, obj.height)
 			var objMaterial = new THREE.MeshStandardMaterial({color: obj.color}); 
-			const objMesh = new THREE.Mesh(objGeometry, objMaterial)  // Build box
-			objMesh.position.set(
-				obj.position[0], 
-				obj.position[1], 
-				obj.position[2]
-				) 
+			const objMesh = new THREE.Mesh(objGeometry, objMaterial)  
+			objMesh.position.set(obj.position[0], obj.position[1], obj.position[2]) 
 			objMesh.name = `object_${i}` 
-			scene.add(objMesh)  // Add box to canvas
+			scene.add(objMesh) 
 		} else {
 			if(obj.visible) {
-				object.position.set(
-					obj.position[0], 
-					obj.position[1], 
-					obj.position[2]
-				) 
+				object.position.set(obj.position[0], obj.position[1], obj.position[2]) 
 			} else {
 				scene.remove(object)
 			}
