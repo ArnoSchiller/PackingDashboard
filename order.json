@@ -1,0 +1,67 @@
+{
+    "order_id": "xyz",
+    "articles": [
+        {
+            "id": "K1",
+            "length": 1832,
+            "width": 274,
+            "height": 152,
+            "weight": 40.1,
+            "amount": 11
+        },
+        {
+            "id": "A10",
+            "length": 1795,
+            "width": 250,
+            "height": 20,
+            "weight": 5.73,
+            "amount": 1
+        },
+        {
+            "id": "A11",
+            "length": 1764,
+            "width": 25,
+            "height": 40,
+            "weight": 0.97,
+            "amount": 11
+        },
+        { 
+            "id": "NO44A (nicht in Excel)",
+            "length": 2402,
+            "width": 68,
+            "height": 68,
+            "weight": 0.0,
+            "amount": 12
+        },
+        {
+            "id": "NO35R (nicht in Excel)",
+            "length": 1802,
+            "width": 68,
+            "height": 68,
+            "weight": 0.0,
+            "amount": 3
+        },
+        {
+            "id": "AW02 (nicht in Excel)",
+            "length": 2000,
+            "width": 26,
+            "height": 27,
+            "weight": 0.0,
+            "amount": 1
+        }
+    ],
+    "supplies": [
+        {
+            "id": "NOSP",
+            "amount": 12
+        },
+        {
+            "id": "BetonSpenner",
+            "amount": 32
+        },
+        {
+            "id": "PALETTE",
+            "amount": 2
+        }
+    ]
+}

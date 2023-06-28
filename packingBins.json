@@ -1,0 +1,342 @@
+{
+    "order_id": "xyz",
+    "packing_variants": [
+        [
+            {
+                "colli": 1,
+                "colli_total": 2,
+                "positions": [
+                    {
+                        "article_id": "K1",
+                        "centerpoint_x": 263,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 0,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "K1",
+                        "centerpoint_x": -17,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 0,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "K1",
+                        "centerpoint_x": 263,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 153,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "K1",
+                        "centerpoint_x": -17,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 153,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "K1",
+                        "centerpoint_x": 263,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 305,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "K1",
+                        "centerpoint_x": -17,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 305,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "NO44A (nicht in Excel)",
+                        "centerpoint_x": -200,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 0,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "NO44A (nicht in Excel)",
+                        "centerpoint_x": -270,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 0,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "NO44A (nicht in Excel)",
+                        "centerpoint_x": -340,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 0,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "NO44A (nicht in Excel)",
+                        "centerpoint_x": -200,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 68,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "NO44A (nicht in Excel)",
+                        "centerpoint_x": -270,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 68,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "NO44A (nicht in Excel)",
+                        "centerpoint_x": -340,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 68,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "A11",
+                        "centerpoint_x": -205,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 136,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "A11",
+                        "centerpoint_x": -230,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 136,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "A11",
+                        "centerpoint_x": -255,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 136,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "A11",
+                        "centerpoint_x": -205,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 176,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "A11",
+                        "centerpoint_x": -230,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 176,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "A11",
+                        "centerpoint_x": -255,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 176,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "NO35R (nicht in Excel)",
+                        "centerpoint_x": -320,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 136,
+                        "rotation": 0
+                    }
+                ]
+            },
+            {
+                "colli": 2,
+                "colli_total": 2,
+                "positions": [
+                    {
+                        "article_id": "K1",
+                        "centerpoint_x": 263,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 0,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "K1",
+                        "centerpoint_x": -17,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 0,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "K1",
+                        "centerpoint_x": 263,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 153,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "K1",
+                        "centerpoint_x": -17,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 153,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "K1",
+                        "centerpoint_x": 263,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 305,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "A10",
+                        "centerpoint_x": -17,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 305,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "NO44A (nicht in Excel)",
+                        "centerpoint_x": -200,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 0,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "NO44A (nicht in Excel)",
+                        "centerpoint_x": -270,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 0,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "NO44A (nicht in Excel)",
+                        "centerpoint_x": -340,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 0,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "NO44A (nicht in Excel)",
+                        "centerpoint_x": -200,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 68,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "NO44A (nicht in Excel)",
+                        "centerpoint_x": -270,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 68,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "A11",
+                        "centerpoint_x": -205,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 136,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "A11",
+                        "centerpoint_x": -230,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 136,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "A11",
+                        "centerpoint_x": -255,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 136,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "A11",
+                        "centerpoint_x": -205,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 176,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "A11",
+                        "centerpoint_x": -230,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 176,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "A11",
+                        "centerpoint_x": -255,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 176,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "AW02 (nicht in Excel)",
+                        "centerpoint_x": -290,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 136,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "NO35R (nicht in Excel)",
+                        "centerpoint_x": -340,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 68,
+                        "rotation": 0
+                    },
+                    {
+                        "article_id": "NO35R (nicht in Excel)",
+                        "centerpoint_x": -340,
+                        "centerpoint_y": 0,
+                        "centerpoint_z": 136,
+                        "rotation": 0
+                    }
+                ]
+            }
+        ]
+    ],
+    "articles": [
+        {
+            "id": "K1",
+            "length": 1832,
+            "width": 274,
+            "height": 152,
+            "weight": 40.1,
+            "amount": 11
+        },
+        {
+            "id": "A10",
+            "length": 1795,
+            "width": 250,
+            "height": 20,
+            "weight": 5.73,
+            "amount": 1
+        },
+        {
+            "id": "A11",
+            "length": 1764,
+            "width": 25,
+            "height": 40,
+            "weight": 0.97,
+            "amount": 11
+        },
+        { 
+            "id": "NO44A (nicht in Excel)",
+            "length": 2402,
+            "width": 68,
+            "height": 68,
+            "weight": 0.0,
+            "amount": 12
+        },
+        {
+            "id": "NO35R (nicht in Excel)",
+            "length": 1802,
+            "width": 68,
+            "height": 68,
+            "weight": 0.0,
+            "amount": 3
+        },
+        {
+            "id": "AW02 (nicht in Excel)",
+            "length": 2000,
+            "width": 26,
+            "height": 27,
+            "weight": 0.0,
+            "amount": 1
+        }
+    ]
+}
