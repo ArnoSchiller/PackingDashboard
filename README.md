@@ -1,3 +1,15 @@
+# TLDR
+```
+env\Scripts\activate
+pip install fastapi websockets "uvicorn[standard]"
+uvicorn main:app --reload
+```
+
+Tutorial:
+https://fastapi.tiangolo.com/advanced/websockets
+
+Updated to not use npm
+# Old Version
 ## Installation 
 ```
 # three.js
