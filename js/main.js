@@ -1,5 +1,5 @@
-import * as THREE from '../node_modules/three/build/three.module.js'
-import { TrackballControls } from '../node_modules/three/examples/jsm/controls/TrackballControls.js'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import * as THREE from '../node_modules/three/build/three.module.js';
 
 const MAX_PALETTS = 2
 const PALETT = {
@@ -7,51 +7,29 @@ const PALETT = {
     "length": 1200,
     "height": 1000
 }
+var objectsList = []
+var current_bin = 0 
 
 const BOTTOM_PADDING = 100
-class Position {
-    constructor(x, y, z) {
-      this.x = x 
-      this.y = y 
-      this.z = z 
-    }
-}
 
-const objects = []
-var objectsList = []
+const baseUrl = "localhost:8000"
 
-/*
-readTextFile("../order.json", function(text){
-    var data = JSON.parse(text)
-    for(let i = 0; i<data["articles"].length; i++) {
-        var article = data["articles"][i] 
-        
-        let obj = new PackedObject3D(
-            article["id"], article["width"], article["length"], article["height"]
-        )
-        objects.push(obj)
-    
-        for (let j = 0; j < article["amount"]; j++) {
-            let object = new PackedObject3D(obj.name, obj.width, obj.length, obj.height)
-            objectsList.push(object)
-        }
-    }  
-})
-*/
+const contentDiv = document.getElementById('content-container');
+const infoDiv = document.getElementById('info-container')
 
-readTextFile("../packingBins.json", function(text){
-    var data = JSON.parse(text)
+function loadData(jsonData) {
+    objectsList = []
     var articles = {}
-    for(let i = 0; i<data["articles"].length; i++) {
+    for(let i = 0; i<jsonData["articles"].length; i++) {
         
-        var article = data["articles"][i] 
+        var article = jsonData["articles"][i] 
         articles[article["id"]] = {
             "width": article["width"], 
             "length": article["length"], 
             "height": article["height"]
         }
     }
-    let variant = data["packing_variants"][0]
+    let variant = jsonData["packing_variants"][0]
     console.log(variant)
     for(let i = 0; i < variant.length; i++){
         let colli = variant[i]
@@ -72,11 +50,163 @@ readTextFile("../packingBins.json", function(text){
             objectsList.push(object)
         }
     }
+}
 
-    createEditPanel()
-})
+function showInfo(infoText, infoType="info") {
+    infoDiv.innerText = infoText;
+    infoDiv.style.display = 'flex';
+    
+    var hideButton = document.createElement('button');
+    hideButton.style.marginLeft = "30px"
+    hideButton.innerText = "OK"
+    hideButton.addEventListener('click', function(event){
+        hideInfo()
+    })
+    infoDiv.appendChild(hideButton)
+} 
+function hideInfo() {
+    infoDiv.style.display = 'none';
+}
 
-var current_bin = 0 
+function showErrorView(message, callback) {
+    contentDiv.innerHTML = ""
+    var container = document.createElement("div")
+    container.setAttribute('class', 'errorContainer')
+    
+    const messageDiv = document.createElement("div") 
+    messageDiv.setAttribute('class', 'errorMessage')
+    messageDiv.innerText = message
+    container.appendChild(messageDiv)
+
+    if(callback !== null) {
+        const retryButton = document.createElement('retry')
+        retryButton.setAttribute('id', 'retry')
+        retryButton.setAttribute('class', 'retryButton')
+        // Set button content
+        retryButton.textContent = 'Erneut versuchen';
+        retryButton.addEventListener('click', function() {
+            console.log('Button clicked!')
+            callback()
+        });
+        container.appendChild(retryButton)
+    }
+    contentDiv.appendChild(container)
+}
+
+function showDataView(data) {
+    if(data == null) {
+        showErrorView("Keine Daten vorhanden.", null)
+    } else {
+        try {
+            loadData(data)
+            showInfo("Loading done")
+            drawThreeJs(contentDiv)
+        } catch (e) {
+            console.log(e)
+        showErrorView("Darstellen der Daten fehlgeschlagen.", null)
+        }
+    }
+    
+}
+
+function connectToServer() {
+    showInfo("Verbindung zum Server wird hergestellt ...")
+    var url = "http://" + baseUrl + "/order/test_order"
+    console.log(url)
+    fetch(url, {
+        method: "POST",
+        body: JSON.stringify({
+            userId: 1,
+            title: "Fix my bugs",
+            completed: false
+        }),
+        headers: {
+            "content-type": "application/json; charset=UTF-8"
+        }
+    })
+    .then((response) => response.json())
+    .then((json) => {
+        console.log(json)
+        if (json.token !== null && json.url !== null) {
+
+            connectToWebsocket(json.url, json.token)
+        }
+    })   
+    .catch(failed => {
+        console.log("POST - Failed to connect to server: " + failed)
+        showErrorView("Eine Verbindung zum Server konnte nicht hergestellt werden.", connectToServer)
+
+    })
+}
+
+function connectToWebsocket(url, token) {
+    var wsUrl = "ws://" + baseUrl + url + "?token=" + token
+    console.log(wsUrl)
+    //`ws://localhost:8000/ws/order/test_order?token=test_token`
+    var webSocket = new WebSocket(wsUrl)
+    webSocket.onopen = function(event) {
+        showInfo("Verbindung zum Server hergestellt.")
+        showDataView(null)
+    }
+    webSocket.onclose = function(event) {
+        showErrorView("Verbindung zum Server verloren.", function(){
+            connectToWebsocket(url, token)
+        })
+    }
+    webSocket.onerror = function(event) {
+        showInfo("Bei der Verbindung mit dem Server ist ein Fehler aufgetreten.", "error")
+    }
+    webSocket.onmessage = function(event) {
+        console.log(event)
+        if(isJsonString(event.data)) {
+            handleResponse(event.data)
+        } else {
+            console.log("Received: " +event.data)
+        }
+    }
+}
+
+function isJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
+function handleResponse(response) {
+
+    response = JSON.parse(response)
+
+    var infoType = "info"
+    try {     
+        if ("status" in response &&  ["error", "sucess"].includes(response["status"])){
+            infoType = response["status"].toLowerCase()
+        }
+                
+        if ("data" in response){
+            showDataView(response["data"])
+        } else {
+            showDataView(null)
+        }
+                        
+    } catch (error) {
+        showErrorView("Antwort vom Server fehlerhaft.", null)
+        console.error(error);
+    }
+}
+
+connectToServer()
+
+class Position {
+    constructor(x, y, z) {
+      this.x = x 
+      this.y = y 
+      this.z = z 
+    }
+}
+
 class PackedObject3D {
 	constructor(name, width, length, height) {
 		this.name = name 
@@ -354,6 +484,12 @@ function createEditPanel() {
 #                               three.js                                        #
 #################################################################################
 */
+function drawThreeJs(container) {
+    container.innerHTML = ""
+    container.appendChild(renderer.domElement) 
+    
+    rendering() 
+}
 // Scene
 const scene = new THREE.Scene() 
 scene.rotation.z = 5 * Math.PI / 4 
@@ -361,19 +497,101 @@ const rotAxis = new THREE.Vector3(1,0, 0)
 scene.rotateOnWorldAxis(rotAxis, 6.5 * Math.PI / 4) 
 
 // Camera
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 2 / (window.innerHeight - BOTTOM_PADDING), 0.6, 10000) 
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / (window.innerHeight - BOTTOM_PADDING), 0.6, 10000) 
 camera.position.z = 2000 
-
 
 // Renderer
 const renderer = new THREE.WebGLRenderer({antialias: true}) 
-renderer.setClearColor("#FFFFFF")  // Set background colour
-renderer.setSize(window.innerWidth/2, window.innerHeight - BOTTOM_PADDING) 
-document.getElementById("plotContainer").appendChild(renderer.domElement)  // Add renderer to HTML as a canvas element
+renderer.setClearColor("#FFFFFF") 
+renderer.setSize(window.innerWidth, window.innerHeight - BOTTOM_PADDING) 
+
+// Make Canvas Responsive
+window.addEventListener('resize', () => {
+    renderer.setSize(window.innerWidth, window.innerHeight - BOTTOM_PADDING)  
+    camera.aspect = window.innerWidth / (window.innerHeight - BOTTOM_PADDING)  // Update aspect ratio
+    camera.updateProjectionMatrix()  // Apply changes
+})
 
 // Add ambient light
-const light = new THREE.AmbientLight( 0xFFFFFF )  // soft white light
+const light = new THREE.AmbientLight( 0xFFFFFF ) 
 scene.add( light ) 
+
+//Trackball Controls for Camera 
+const controls = new OrbitControls(camera, renderer.domElement)  
+controls.maxDistance = 5000 
+controls.minDistance = 1000 
+
+drawPalett(scene)
+    
+
+const rendering = function() {
+    // Rerender every time the page refreshes (pause when on another tab)
+    requestAnimationFrame(rendering) 
+      // Update trackball controls
+    controls.update() 
+        for (let i = 0;  i < objectsList.length;  i++) {
+            let obj = objectsList[i] 
+            var object = scene.getObjectByName(`object_${i}`) 
+            if (object == null && obj.visible && obj.bin == current_bin) {
+                const objGeometry = new THREE.BoxGeometry(obj.width, obj.length, obj.height)
+                var objMaterial = new THREE.MeshStandardMaterial({color: obj.color}); 
+                const objMesh = new THREE.Mesh(objGeometry, objMaterial)  
+                objMesh.position.set(obj.position[0], obj.position[1], obj.position[2]) 
+                objMesh.name = `object_${i}` 
+                scene.add(objMesh) 
+            } else {
+                if(obj.visible && obj.bin == current_bin) {
+                    object.position.set(obj.position[0], obj.position[1], obj.position[2]) 
+                } else {
+                    scene.remove(object)
+                }
+            }
+        }
+        renderer.render(scene, camera) 
+  }
+function drawPalett(scene) {
+    
+    // Load texture for palett
+    const image = new Image()
+    const texture = new THREE.Texture(image)
+    image.addEventListener('load', () =>
+    {
+        texture.needsUpdate = true
+    })
+    image.src = '../static/textures/wood.jpg'
+
+    // Create palett
+    let MAX_X = PALETT["width"], MAX_Y = PALETT["length"], MAX_Z = PALETT["height"]
+    const palettGeometry = new THREE.BoxGeometry(MAX_X, MAX_Y, 0.5)  
+    const palettMaterial = new THREE.MeshLambertMaterial({color: 0xe3e2ca, map: texture})  // Define material
+    const palettMesh = new THREE.Mesh(palettGeometry, palettMaterial)  
+    palettMesh.position.z = - MAX_Z / 2 -0.25
+    scene.add(palettMesh)  
+
+    const points = [];
+    points.push( new THREE.Vector3( -MAX_X/2, -MAX_Y/2, -MAX_Z/2 ) );
+    points.push( new THREE.Vector3( -MAX_X/2, -MAX_Y/2, MAX_Z/2) );
+    points.push( new THREE.Vector3( -MAX_X/2, MAX_Y/2, MAX_Z/2 ) );
+    points.push( new THREE.Vector3( -MAX_X/2, MAX_Y/2, -MAX_Z/2 ) );
+
+    points.push( new THREE.Vector3( -MAX_X/2, MAX_Y/2, MAX_Z/2 ) );
+    points.push( new THREE.Vector3( MAX_X/2, MAX_Y/2, MAX_Z/2 ) );
+    points.push( new THREE.Vector3( MAX_X/2, MAX_Y/2, -MAX_Z/2 ) );
+
+    points.push( new THREE.Vector3( MAX_X/2, MAX_Y/2, MAX_Z/2 ) );
+    points.push( new THREE.Vector3( MAX_X/2, -MAX_Y/2, MAX_Z/2 ) );
+    points.push( new THREE.Vector3( MAX_X/2, -MAX_Y/2, -MAX_Z/2 ) );
+
+    points.push( new THREE.Vector3( MAX_X/2, -MAX_Y/2, MAX_Z/2 ) );
+    points.push( new THREE.Vector3( -MAX_X/2, -MAX_Y/2, MAX_Z/2 ) );
+
+    const material = new THREE.LineBasicMaterial( { color: 0xaaaaaa } );
+    const geometry = new THREE.BufferGeometry().setFromPoints( points );
+    const line = new THREE.Line( geometry, material );
+    scene.add( line );
+}
+
+
 
 /*
 // Add axes helper
@@ -386,88 +604,12 @@ const divisions = 10
 const gridHelper = new THREE.GridHelper( size, divisions ) 
 scene.add( gridHelper ) 
 */ 
-//Trackball Controls for Camera 
-const controls = new TrackballControls(camera, renderer.domElement)  
-controls.maxDistance = 5000 
-controls.minDistance = 1000 
-
-// Make Canvas Responsive
-window.addEventListener('resize', () => {
-	renderer.setSize(window.innerWidth/2, window.innerHeight - BOTTOM_PADDING)  
-    camera.aspect = window.innerWidth / 2 / (window.innerHeight - BOTTOM_PADDING)  // Update aspect ratio
-    camera.updateProjectionMatrix()  // Apply changes
-})
-
-// Load texture for palett
-const image = new Image()
-const texture = new THREE.Texture(image)
-image.addEventListener('load', () =>
-{
-    texture.needsUpdate = true
-})
-image.src = '../static/textures/wood.jpg'
-
-// Create palett
-let MAX_X = PALETT["width"], MAX_Y = PALETT["length"], MAX_Z = PALETT["height"]
-const palettGeometry = new THREE.BoxGeometry(MAX_X, MAX_Y, 0.5)  
-const palettMaterial = new THREE.MeshLambertMaterial({color: 0xe3e2ca, map: texture})  // Define material
-const palettMesh = new THREE.Mesh(palettGeometry, palettMaterial)  
-palettMesh.position.z = - MAX_Z / 2 -0.25
-scene.add(palettMesh)  
-
-const points = [];
-points.push( new THREE.Vector3( -MAX_X/2, -MAX_Y/2, -MAX_Z/2 ) );
-points.push( new THREE.Vector3( -MAX_X/2, -MAX_Y/2, MAX_Z/2) );
-points.push( new THREE.Vector3( -MAX_X/2, MAX_Y/2, MAX_Z/2 ) );
-points.push( new THREE.Vector3( -MAX_X/2, MAX_Y/2, -MAX_Z/2 ) );
-
-points.push( new THREE.Vector3( -MAX_X/2, MAX_Y/2, MAX_Z/2 ) );
-points.push( new THREE.Vector3( MAX_X/2, MAX_Y/2, MAX_Z/2 ) );
-points.push( new THREE.Vector3( MAX_X/2, MAX_Y/2, -MAX_Z/2 ) );
-
-points.push( new THREE.Vector3( MAX_X/2, MAX_Y/2, MAX_Z/2 ) );
-points.push( new THREE.Vector3( MAX_X/2, -MAX_Y/2, MAX_Z/2 ) );
-points.push( new THREE.Vector3( MAX_X/2, -MAX_Y/2, -MAX_Z/2 ) );
-
-points.push( new THREE.Vector3( MAX_X/2, -MAX_Y/2, MAX_Z/2 ) );
-points.push( new THREE.Vector3( -MAX_X/2, -MAX_Y/2, MAX_Z/2 ) );
-
-const material = new THREE.LineBasicMaterial( { color: 0xaaaaaa } );
-const geometry = new THREE.BufferGeometry().setFromPoints( points );
-const line = new THREE.Line( geometry, material );
-scene.add( line );
-
 /* 
 #################################################################################
 #                            three.js rendering                                 #
 #################################################################################
 */
-const rendering = function() {
-  // Rerender every time the page refreshes (pause when on another tab)
-  requestAnimationFrame(rendering) 
-	// Update trackball controls
-  controls.update() 
-	for (let i = 0;  i < objectsList.length;  i++) {
-		let obj = objectsList[i] 
-		var object = scene.getObjectByName(`object_${i}`) 
-		if (object == null && obj.visible && obj.bin == current_bin) {
-			const objGeometry = new THREE.BoxGeometry(obj.width, obj.length, obj.height)
-			var objMaterial = new THREE.MeshStandardMaterial({color: obj.color}); 
-			const objMesh = new THREE.Mesh(objGeometry, objMaterial)  
-			objMesh.position.set(obj.position[0], obj.position[1], obj.position[2]) 
-			objMesh.name = `object_${i}` 
-			scene.add(objMesh) 
-		} else {
-			if(obj.visible && obj.bin == current_bin) {
-				object.position.set(obj.position[0], obj.position[1], obj.position[2]) 
-			} else {
-				scene.remove(object)
-			}
-		}
-	}
-	renderer.render(scene, camera) 
-}
-rendering() 
+
 
 function readTextFile(file, callback) {
     var rawFile = new XMLHttpRequest();

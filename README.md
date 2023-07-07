@@ -4,12 +4,11 @@ env\Scripts\activate
 pip install fastapi websockets "uvicorn[standard]"
 uvicorn main:app --reload
 ```
+In another shell run the vite server.
 
 Tutorial:
 https://fastapi.tiangolo.com/advanced/websockets
 
-Updated to not use npm
-# Old Version
 ## Installation 
 ```
 # three.js

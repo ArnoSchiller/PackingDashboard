@@ -33,10 +33,6 @@ app.add_middleware(
 root = os.path.dirname(os.path.abspath(__file__))
 
 
-app.mount("/js", StaticFiles(directory=os.path.join(root, 'js')), name="js")
-app.mount("/css", StaticFiles(directory=os.path.join(root, 'css')), name="css")
-
-
 class ConnectionManager:
     def __init__(self):
         self.active_connections: list[WebSocket] = []
@@ -68,13 +64,6 @@ class ConnectionManager:
 
 known_tokens = {"test_order": "test_token"}
 manager = ConnectionManager()
-
-
-@app.get("/")
-async def main():
-    with open(os.path.join(root, 'html/index.html')) as fh:
-        data = fh.read()
-    return Response(content=data, media_type="text/html")
 
 
 @app.post("/order/{order_id}")
