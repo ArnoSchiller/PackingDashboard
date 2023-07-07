@@ -30,12 +30,12 @@ function loadData(jsonData) {
         }
     }
     let variant = jsonData["packing_variants"][0]
-    console.log(variant)
+    // console.log(variant)
     for(let i = 0; i < variant.length; i++){
         let colli = variant[i]
         for(let j = 0; j < colli.positions.length; j++) {
             let pos = colli.positions[j]
-            console.log(pos)
+            // console.log(pos)
             
             let name = pos["article_id"]
             let w = articles[name]["width"]
@@ -98,6 +98,7 @@ function showDataView(data) {
         showErrorView("Keine Daten vorhanden.", null)
     } else {
         try {
+            showInfo("Loading data ...")
             loadData(data)
             showInfo("Loading done")
             drawThreeJs(contentDiv)
@@ -112,7 +113,7 @@ function showDataView(data) {
 function connectToServer() {
     showInfo("Verbindung zum Server wird hergestellt ...")
     var url = "http://" + baseUrl + "/order/test_order"
-    console.log(url)
+    //console.log(url)
     fetch(url, {
         method: "POST",
         body: JSON.stringify({
@@ -126,7 +127,7 @@ function connectToServer() {
     })
     .then((response) => response.json())
     .then((json) => {
-        console.log(json)
+        // console.log(json)
         if (json.token !== null && json.url !== null) {
 
             connectToWebsocket(json.url, json.token)
@@ -141,7 +142,7 @@ function connectToServer() {
 
 function connectToWebsocket(url, token) {
     var wsUrl = "ws://" + baseUrl + url + "?token=" + token
-    console.log(wsUrl)
+    //console.log(wsUrl)
     //`ws://localhost:8000/ws/order/test_order?token=test_token`
     var webSocket = new WebSocket(wsUrl)
     webSocket.onopen = function(event) {
@@ -157,7 +158,7 @@ function connectToWebsocket(url, token) {
         showInfo("Bei der Verbindung mit dem Server ist ein Fehler aufgetreten.", "error")
     }
     webSocket.onmessage = function(event) {
-        console.log(event)
+        // console.log(event)
         if(isJsonString(event.data)) {
             handleResponse(event.data)
         } else {
